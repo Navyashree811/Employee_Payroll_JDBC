@@ -1,27 +1,24 @@
-/* * UC5:- Ability to retrieve all employees who have joined in a particular data range from the payroll service database .
+/* UC6:- Ability to find sum, average, min, max and number of male and female employees .
  *
  * @author : Navaya Shree
  * @since : 9/15/2022
  */
 package com.bridgelabz.jdbc;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Connection;
-import java.sql.Date;
 
 public class EmployeePayroll {
 	static Connection con;
+	static Statement stmt;
+	static ResultSet rs;
 
 	public static void main(String[] args) throws Exception, SQLException {
 
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		String qry = "select * from employee_payroll where start between Cast('2020-01-01' as date) and date (now())";
+		String qry = "select avg(basic_pay), sum(basic_pay), min(basic_pay), max(basic_pay) from employee_payroll where gender = 'F' group by gender; ";
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
 
 			System.out.println("Driver Class Loaded");
 
@@ -29,28 +26,14 @@ public class EmployeePayroll {
 
 			System.out.println("Connetion Establish with db server");
 
-			pstmt = con.prepareStatement(qry);
+			stmt = con.createStatement();
 			System.out.println("Data Update");
 
-			rs = pstmt.executeQuery();
+			rs = stmt.executeQuery(qry);
 
 			while (rs.next()) {
-				int id = rs.getInt(1);
-				String name = rs.getString(2);
-				long phone_number = rs.getLong(3);
-				String address = rs.getString(4);
-				String gender = rs.getString(5);
-				double basic_pay = rs.getDouble(6);
-				double deductions = rs.getDouble(7);
-				double taxable_pay = rs.getDouble(8);
-				double tax = rs.getDouble(9);
-				double met_pay = rs.getDouble(10);
-				Date state = rs.getDate(11);
-
-				System.out.println("EmpId :-" + id + "  " + "EmpName :- " + name + " " + "Emp_PhoneNo. :-"
-						+ phone_number + " " + "EmpAddress :- " + address + " " + "Gender :- " + gender + " "
-						+ "Basic_Pay " + basic_pay + " " + " Deduction :- " + deductions + " " + "Taxable_pay :- "
-						+ taxable_pay + " " + "Tax :-" + tax + " " + "Met_Pay :- " + met_pay + " " + "Date :-" + state);
+				double sum = rs.getDouble(1);
+				System.out.println("avgrage of basic_pay : " + sum);
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
@@ -66,9 +49,9 @@ public class EmployeePayroll {
 				}
 
 			}
-			if (pstmt != null) {
+			if (stmt != null) {
 				try {
-					pstmt.close();
+					stmt.close();
 
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -85,6 +68,5 @@ public class EmployeePayroll {
 			}
 			System.out.println("Closed All Resources");
 		}
-
 	}
 }
